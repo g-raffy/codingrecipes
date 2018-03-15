@@ -187,8 +187,8 @@ class CMakeExporter(ISourceSetExporter):
 			f.write(')\n')
 				
 			if project.has_cpp_files():
-				f.write('target_compile_options(gameengine PRIVATE -Werror)\n')
-				f.write('target_compile_features(gameengine PRIVATE cxx_std_11)\n')
+				f.write('target_compile_options(%s PRIVATE -Werror)\n' % project.name)
+				f.write('target_compile_features(%s PRIVATE cxx_std_11)\n' % project.name)
 			# 				
 			f.write('##############################################\n')
 			f.write('# Installation instructions\n')
@@ -198,11 +198,16 @@ class CMakeExporter(ISourceSetExporter):
 			f.write('\n')
 			f.write('install(TARGETS %s\n' % project.name)
 			f.write('   EXPORT %s-targets\n' % project.name)
+			if project.type == ProjectType.application:
+				f.write('	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}\n')
 			f.write('	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}\n')
 			f.write('   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}\n')
 			f.write(')\n')
-			f.write('\n')
-			f.write('install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})\n')
+			
+			if project.type == ProjectType.static_library:
+				f.write('\n')
+				f.write('install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})\n')
+			
 			f.write('\n')
 			f.write('# This would be required if we wanted the exported target to have a different name than math (eg MyMath)\n')
 			f.write('#set_target_properties(math PROPERTIES EXPORT_NAME MyMath)\n')
@@ -368,15 +373,31 @@ namespace gameengine
 	set1.add_project(game_engine_project)
 	
 	game_engine_project.add_dependency(math_project)
+	
+	game1_project = Project('game1', ProjectType.application)
+	game1_project.add_source(SourceFile('main.cpp', r"""
+
+#include <gameengine/transform.hpp>
+
+int main(int argc, char* argv[])
+{
+	gameengine::Transform t1;
+	math::Vector3 v1 = t1.getTranslation();
+}
+
+"""))
+
+	game1_project.add_dependency(game_engine_project)
+
+	set1.add_project(game1_project)
 		
-	#create_math_source(set_root_path+'/lib/libmath')
-	#create_game_engine_source(set_root_path+'/lib/libgameengine')
-	#create_game1_source()
 	return set1
 	
 def test_dep_handling_methods():
 	set1 = create_example1_set()
-	for method in [ CMakeExporter.DepHandlingMethod.use_master, CMakeExporter.DepHandlingMethod.use_subdir ]:
+	methods = [ CMakeExporter.DepHandlingMethod.use_master, CMakeExporter.DepHandlingMethod.use_subdir ]
+	# methods = [ CMakeExporter.DepHandlingMethod.use_subdir ]
+	for method in methods:
 		print("================ testing dependency handling method %s" % { CMakeExporter.DepHandlingMethod.use_master:'master', CMakeExporter.DepHandlingMethod.use_subdir:'subdir' }[method] )
 		set_exporter = CMakeExporter('/tmp/example1', CMakeExporter.DepHandlingMethod.use_master)
 		set_exporter.export_source_set(set1)
