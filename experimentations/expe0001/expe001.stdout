@@ -1,0 +1,21 @@
+DEBUG:root:running ['mkdir -p /opt/ipr/cluster/work.local/graffy/codingrecipes/experimentations/expe0001'] on alambix97.ipr.univ-rennes.fr
+sending incremental file list
+expe0001.py
+expe001.stdout
+
+sent 1,532 bytes  received 90 bytes  1,081.33 bytes/sec
+total size is 17,310  speedup is 10.67
+INFO:root:building dgemm_test against mkl library mkl-dynamic-lp64-gomp version 2024.2.1
+DEBUG:root:running ['source /etc/profile.d/modules.sh', 'module load lib/mkl/2024.2.1', 'pwd', 'compilation cflags: $(pkgconf --cflags mkl-dynamic-lp64-gomp)', 'gcc -c $(pkgconf --cflags mkl-dynamic-lp64-gomp) dgemm_test.c', 'gcc -o dgemm_test $(pkgconf --libs mkl-dynamic-lp64-gomp) dgemm_test.o'] on alambix97.ipr.univ-rennes.fr
+mkdir -p /opt/ipr/cluster/work.local/graffy/codingrecipes/experimentations/expe0001
+cd /opt/ipr/cluster/work.local/graffy/codingrecipes/experimentations/expe0001 && source /etc/profile.d/modules.sh && module load lib/mkl/2024.2.1 && pwd && compilation cflags: \$(pkgconf --cflags mkl-dynamic-lp64-gomp) && gcc -c \$(pkgconf --cflags mkl-dynamic-lp64-gomp) dgemm_test.c && gcc -o dgemm_test \$(pkgconf --libs mkl-dynamic-lp64-gomp) dgemm_test.o
+Traceback (most recent call last):
+  File "./expe0001.py", line 73, in <module>
+    main()
+  File "./expe0001.py", line 53, in main
+    completed_process = command_runner.run_commands(build_commands, work_dir=expe_tmp_dir)
+  File "./expe0001.py", line 22, in run_commands
+    completed_process = subprocess.run(f'ssh {self.target_machine_fqdn} "{bash_commands_as_str}"', shell=True, check=abort_on_error, executable='/bin/bash', capture_output=True)
+  File "/usr/lib/python3.8/subprocess.py", line 516, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command 'ssh alambix97.ipr.univ-rennes.fr "cd /opt/ipr/cluster/work.local/graffy/codingrecipes/experimentations/expe0001 && source /etc/profile.d/modules.sh && module load lib/mkl/2024.2.1 && pwd && compilation cflags: \$(pkgconf --cflags mkl-dynamic-lp64-gomp) && gcc -c \$(pkgconf --cflags mkl-dynamic-lp64-gomp) dgemm_test.c && gcc -o dgemm_test \$(pkgconf --libs mkl-dynamic-lp64-gomp) dgemm_test.o"' returned non-zero exit status 127.
